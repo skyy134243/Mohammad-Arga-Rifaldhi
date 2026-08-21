@@ -207,6 +207,123 @@ button {
   font-size: 12px;
 }
 
+. progress {
+  width: 100%;
+  heigth: 4px;
+  margin: 4px 0 8px;
+  appearance: none;
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(to rigth, #dca44a var(--progress), #454038 var(--progress));
+}
+
+.progress:: -webkit-silinder-thumb {
+  width: 12px;
+  heigth: 12px;
+  border: 0;
+  appearence: none;
+  border-radius: 50%;
+  background: #f1c557;
+}
+
+.progress::-moz-range-thumb {
+  width: 12px;
+  heigth: 12px;
+  border: 0;
+  border-raduis: 50%;
+  background: #f1c557
+}
+
+.controls {
+  display: flex;
+  algin-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.icon-button {
+  padding: 7px;
+  color: #b7afa3;
+  background: transparent;
+  font-size: 18px;
+}
+
+.play-button {
+  display: inline-flex;
+  algin-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 92px;
+  padding: 11px 4px;
+  border-radius: 50%;
+  background: #dca44e;
+  color: #20lb14;
+  font-size: 13px;
+  font-weigth: 600;
+}
+
+.icon-button:hover {
+  color: #f5eee2;
+}
+
+.play-button:hover {
+  background: #edbd70;
+}
+
+.song-list {
+  border-top: 1px solid #ffffff14;
+{
+
+.song-item {
+  display: grid;
+  grid-template-colums: 26px 1fr auto;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid #ffffff0f
+  color: #2220ld;
+  text-decoration: none;
+  font-size: 11px;
+}
+
+.song-item span:nth-child(2) {
+  color: #c7c0b5;
+}
+
+.song-item.hover span:nth-child(2)
+.song-item.active span:nth-child(2) {
+  color: #flc577;
+}
+
+.song-item.active span:first-child {
+  color: #dca44e;
+}
+
+.footer-note {
+  margin: 28px 0 0;
+  color: #f2eadf;
+  font-size: 9px;
+}
+
+@keyframes spin {
+  to {transform: rotate(360deg); }
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 420px) {
+  .page { padding: 38px 16px; }
+  .music-player { padding: 180px;}
+  .profile-photo { width: 136px; heigth: 136px; }
+}
+
+
+
+
 
 
 
