@@ -8,16 +8,16 @@ const $ = (id) => document.querySelecton(id);
 
 const title = $("#title");
 const artist = $("#artist");
-const link = $("#link');
+const link = $("#link");
 const bar = $("#progress");
-const now = $("#now);
+const now = $("#now");
 const left = $("#left");
 const status = $("#status");
 const vinyl = $("#vinyl");
 const list = $("#list");
 const playBtn = $("#play");
 
-const audio = new audio();
+const audio = new Audio();
 let currentSongIndex = 0;
 let isPlaying = false;
 
@@ -43,7 +43,7 @@ list.innerHTML = songs.map((songData, index) => {
   return `
   <a class="song-item${isActive}" data-song="${index}" href="javascript:void(0);">
   <span>0${index + 1}</span>
-  <span>${songData[0]</span>
+  <span>${songData[0]}</span>
   <span>▶️</span>
 </a>
 `;
@@ -113,6 +113,7 @@ list.onclick = event => {
   const item = event.target.closest("[data-song]")
   if (item) {
    changeSong(Number(item.dataset.song));
-  };
+  }
+};
 
 updateUI();
