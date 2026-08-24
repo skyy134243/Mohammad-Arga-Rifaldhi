@@ -1,10 +1,10 @@
 const songs = [
-  ["About You", "The 1975", 326, "About You.mp3"]
-  ["Sesi Potre", "enau feat Ari Lasmana", 243, "Sesi Potret.mp3"]
-  ["Jatuh Suka", "Tulus", 235, "Jatuh Suka.mp3]
+  ["About You", "The 1975", 326, "About You.mp3"],
+  ["Sesi Potret", "enau feat Ari Lasmana", 243, "Sesi Potret.mp3"],
+  ["Jatuh Suka", "Tulus", 235, "Jatuh Suka.mp3"],
 ];
 
-const $ = (id) => document.querySelecton(id);
+const $ = (id) => document.querySelector(id);
 
 const title = $("#title");
 const artist = $("#artist");
@@ -25,33 +25,57 @@ const formatTime = (seconds) => {
   if (isNaN(seconds)) return "0:00";
   const minutes = Math.floor(seconds / 60);
   const secs = String(Math.floor(seconds % 60)).padStart(2, "0");
-  return `$@{minutes}:${secs}`;
+  return `${minutes}:${secs}`;
 };
 
+function createSongItem(songData, index) {
+  const item = document.createElement("a");
+  item.className = "song-item" + (index === currentSongIndex ? " active" : "");
+  item.href = "#";
+  item.dataset.song = String(index);
+  item.setAttribute("role", "listitem");
+
+  const order = document.createElement("span");
+  order.textContent = `0${index + 1}`;
+
+  const name = document.createElement("span");
+  name.textContent = songData[0]; // textContent -> aman dari HTML injection
+
+  const play = document.createElement("span");
+  play.textContent = "▶️";
+
+  item.append(order, name, play);
+  item.addEventListener("click", (e) => e.preventDefault());
+  return item;
+}
+
 function updateUI() {
-  const [name, singer, duration, audioFile] = songs[currentSongIndex];
+  const [name, singer] = songs[currentSongIndex];
 
-title.textContent = name;
-artist.textContent = singer;
+  title.textContent = name;
+  artist.textContent = singer;
 
-link.removeAttribute("href');
-link.style.cursor = "default";
+  link.removeAttribute("href");
+  link.style.cursor = "default";
 
+  list.replaceChildren(...songs.map(createSongItem));
 
-list.innerHTML = songs.map((songData, index) => {
-  const isActive = index === currentSongIndex ? "active" : "";
-  return `
-  <a class="song-item${isActive}" data-song="${index}" href="javascript:void(0);">
-  <span>0${index + 1}</span>
-  <span>${songData[0]}</span>
-  <span>▶️</span>
-</a>
-`;
-}).join("");
-
-status.textContent = isPlaying ? "Memutar" : "Jeda";
+  status.textContent = isPlaying ? "Memutar" : "Jeda";
   playBtn.innerHTML = isPlaying ? "Ⅱ <span>Jeda</span>" : "▶ <span>Putar</span>";
   vinyl.classList.toggle("is-spinning", isPlaying);
+}
+
+function playAudio() {
+  audio.play()
+    .then(() => {
+      isPlaying = true;
+      updateUI();
+    })
+    .catch((err) => {
+      console.error("Gagal memutar audio:", err);
+      isPlaying = false;
+      updateUI();
+    });
 }
 
 // Fungsi untuk mengganti lagu
@@ -59,12 +83,8 @@ function changeSong(index) {
   currentSongIndex = index;
   const audioFile = songs[currentSongIndex][3];
 
-  audio.src = audioFile; 
-
-isPlaying = true;
-  audio.play();
-  
-  updateUI();
+  audio.src = audioFile;
+  playAudio();
 }
 
 function togglePlay() {
@@ -73,21 +93,24 @@ function togglePlay() {
   }
 
   if (isPlaying) {
-    audio.pause(); // Jeda lagu asli
+    audio.pause(); // Jeda lagu
+    isPlaying = false;
+    updateUI();
   } else {
-    audio.play();  // Putar lagu asli
+    playAudio(); // Putar lagu (async, update state setelah berhasil)
   }
-  
-  isPlaying = !isPlaying;
-  updateUI();
 }
 
-audio.addEventListener("timeupdate", () => {
-  const currentTime = audio.currentTime; // Ambil waktu asli dari lagu
-  const duration = songs[currentSongIndex][2]; // Ambil durasi dari array
-  const percent = (currentTime / duration) * 100;
+audio.addEventListener("loadedmetadata", () => {
+  // Gunakan durasi asli dari file audio, bukan angka hardcoded di array
+  bar.max = audio.duration;
+});
 
-  bar.max = duration;
+audio.addEventListener("timeupdate", () => {
+  const currentTime = audio.currentTime;
+  const duration = audio.duration || songs[currentSongIndex][2];
+  const percent = duration ? (currentTime / duration) * 100 : 0;
+
   bar.value = currentTime;
   bar.style.setProperty("--progress", `${percent}%`);
 
@@ -95,6 +118,11 @@ audio.addEventListener("timeupdate", () => {
   left.textContent = `-${formatTime(duration - currentTime)}`;
 });
 
+audio.addEventListener("error", () => {
+  console.error("Terjadi kesalahan saat memuat file audio:", audio.src);
+  isPlaying = false;
+  updateUI();
+});
 
 audio.addEventListener("ended", () => {
   changeSong((currentSongIndex + 1) % songs.length);
@@ -105,14 +133,14 @@ $("#next").onclick = () => changeSong((currentSongIndex + 1) % songs.length);
 $("#prev").onclick = () => changeSong((currentSongIndex + songs.length - 1) % songs.length);
 
 bar.oninput = () => {
-  audio.currentTime = Number(bar.value); 
-  updateUI(); 
+  audio.currentTime = Number(bar.value);
+  now.textContent = formatTime(audio.currentTime);
 };
 
-list.onclick = event => {
-  const item = event.target.closest("[data-song]")
+list.onclick = (event) => {
+  const item = event.target.closest("[data-song]");
   if (item) {
-   changeSong(Number(item.dataset.song));
+    changeSong(Number(item.dataset.song));
   }
 };
 
