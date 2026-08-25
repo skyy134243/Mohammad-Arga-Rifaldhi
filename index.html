@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LAPORKITA - Platform partisipasi masyarakat dan aksi penegak hukum.">
+    <title>LAPORKITA - Platform Pengaduan & Penanganan Wilayah</title>
+    
+    <style>
+        :root {
+            --color-primary: #16794a;
+            --color-primary-dark: #0f5d39;
+            --color-primary-light: #e8f5ee;
+            --color-background: #f5f7f6;
+            --color-surface: #ffffff;
+            --color-surface-soft: #f8faf9;
+            --color-text: #17221c;
+            --color-text-secondary: #46534c;
+            --color-text-muted: #718078;
+            --color-border: #dce4df;
+            --color-border-strong: #c7d2cc;
+            --color-success: #16804b;
+            --color-success-bg: #e7f6ed;
+            --color-warning: #a56a00;
+            --color-warning-bg: #fff5d9;
+            --color-danger: #b43a3a;
+            --shadow-sm: 0 1px 3px rgba(20, 38, 29, 0.06);
+            --shadow-md: 0 6px 20px rgba(20, 38, 29, 0.08);
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --container-width: 1240px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; background: var(--color-background); color: var(--color-text); font-family: Inter, system-ui, sans-serif; line-height: 1.6; }
+        main > section { max-width: var(--container-width); margin-inline: auto; padding: 2rem 1.5rem; }
+        
+        /* HEADER */
+        #site-header {
+            position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
+            height: 4.5rem; padding: 0 1.5rem; background: rgba(255, 255, 255, 0.98); border-bottom: 1px solid var(--color-border);
+        }
+        .brand { font-size: 1.2rem; font-weight: 800; color: var(--color-primary); }
+        nav ul { display: flex; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
+        nav a { padding: 0.5rem 1rem; border-radius: var(--radius-md); font-weight: 600; color: var(--color-text-secondary); text-decoration: none; }
+        nav a:hover, nav a[aria-current="page"] { background: var(--color-primary-light); color: var(--color-primary-dark); }
+        
+        /* BUTTONS & BADGES */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.6rem 1.2rem; border-radius: var(--radius-md); border: 1px solid transparent; font-weight: 700; cursor: pointer; text-decoration: none; gap: 0.5rem; }
+        .btn-primary { background: var(--color-primary); color: white; }
+        .btn-primary:hover { background: var(--color-primary-dark); }
+        .btn-secondary { background: white; color: var(--color-text); border-color: var(--color-border-strong); }
+        .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.85rem; }
+        .status { padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .status-reported { background: var(--color-warning-bg); color: var(--color-warning); }
+        .status-completed { background: var(--color-success-bg); color: var(--color-success); }
+        
+        /* FORMS */
+        .form-field { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+        input, select, textarea { padding: 0.65rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); font: inherit; }
+        fieldset { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.2rem; margin-bottom: 1.2rem; background: white; }
+        legend { font-weight: 700; padding: 0 0.5rem; }
+        
+        /* DASHBOARDS & CARDS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .card { background: white; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
+        
+        /* NOTIFICATIONS & MAP */
+        .notif-badge { background: var(--color-danger); color: white; border-radius: 50%; padding: 2px 7px; font-size: 0.75rem; vertical-align: top; }
+        .map-mockup { background: #e2ece9; border: 2px dashed var(--color-primary); border-radius: var(--radius-lg); min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 1rem; }
+        .map-pin { position: absolute; padding: 6px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; color: white; cursor: pointer; box-shadow: var(--shadow-md); }
+        
+        /* VISUAL CHARTS */
+        .chart-bar-container { display: flex; align-items: flex-end; gap: 1rem; height: 160px; padding-top: 1rem; border-bottom: 2px solid var(--color-border); }
+        .chart-bar { flex: 1; background: var(--color-primary-light); border-top-left-radius: 6px; border-top-right-radius: 6px; position: relative; transition: height 0.5s ease; }
+        .chart-bar-fill { background: var(--color-primary); width: 100%; border-top-left-radius: 6px; border-top-right-radius: 6px; position: absolute; bottom: 0; }
+        .chart-label { margin-top: 0.5rem; font-size: 0.8rem; text-align: center; font-weight: 600; }
+
+        /* MODAL & TABS */
+        .modal { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; padding: 2rem; border-radius: var(--radius-lg); max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .preview-img { max-width: 100%; max-height: 180px; object-fit: cover; border-radius: var(--radius-md); margin-top: 0.5rem; display: none; }
+        .auth-tab-btn { flex: 1; padding: 0.6rem; border: none; background: #eee; cursor: pointer; font-weight: bold; border-radius: var(--radius-md); }
+        .auth-tab-btn.active { background: var(--color-primary); color: white; }
+    </style>
+</head>
+
+<body>
+
+    <header id="site-header">
+        <div class="brand">LAPORKITA</div>
+        <nav>
+            <ul>
+                <li><a href="#beranda" class="nav-link" data-target="beranda">Beranda</a></li>
+                <li><a href="#peta-laporan" class="nav-link" data-target="peta-laporan">Peta Spasial</a></li>
+                <li id="nav-item-report"><a href="#formulir-laporan" class="nav-link" data-target="formulir-laporan">Buat Laporan</a></li>
+                <li id="nav-item-officer-dash" style="display: none;"><a href="#dasbor-penegak" class="nav-link" data-target="dasbor-penegak">Dasbor Penegak <span id="notif-count" class="notif-badge">0</span></a></li>
+                <li id="nav-item-citizen-dash" style="display: none;"><a href="#dasbor-warga" class="nav-link" data-target="dasbor-warga">Laporan Saya</a></li>
+            </ul>
+        </nav>
+        <div>
+            <button type="button" id="btn-login-modal" class="btn btn-secondary">Masuk / Akun</button>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <!-- BERANDA -->
+        <section id="beranda" class="page">
+            <div class="card" style="text-align: center; padding: 3rem 1rem;">
+                <h1>Solusi Partisipasi Masyarakat & Penanganan Cepat</h1>
+                <p>Laporkan kendala fasilitas umum, sosial, dan lingkungan secara akurat dengan dukungan lokasi GPS presisi.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+                    <a href="#formulir-laporan" class="nav-link btn btn-primary" data-target="formulir-laporan">Buat Laporan Warga</a>
+                    <a href="#peta-laporan" class="nav-link btn btn-secondary" data-target="peta-laporan">Lihat Persebaran Masalah</a>
+                </div>
+            </div>
+
+            <h2>Statistik Pelaporan Wilayah</h2>
+            <div class="grid-4">
+                <div class="card"><h3>Total Laporan</h3><h2 id="stat-total">0</h2></div>
+                <div class="card"><h3>Menunggu Respon</h3><h2 id="stat-reported">0</h2></div>
+                <div class="card"><h3>Selesai Dibenahi</h3><h2 id="stat-completed">0</h2></div>
+                <div class="card"><h3>Tingkat Penanganan</h3><h2 id="stat-rate">0%</h2></div>
+            </div>
+        </section>
+
+        <!-- PETA SPASIAL -->
+        <section id="peta-laporan" class="page" style="display: none;">
+            <h2>Peta Sebaran Laporan Wilayah</h2>
+            <p>Memantau sebaran lokasi permasalahan warga secara real-time.</p>
+            <div class="map-mockup" id="map-container">
+                <p style="font-weight: bold; color: var(--color-text-secondary);">Visualisasi GPS Interaktif</p>
+            </div>
+        </section>
+
+        <!-- FORMULIR LAPORAN (WARGA) -->
+        <section id="formulir-laporan" class="page" style="display: none;">
+            <h2>Formulir Pengaduan Masyarakat</h2>
+            <form id="main-report-form">
+                <fieldset>
+                    <legend>Detail Laporan</legend>
+                    <div class="form-field">
+                        <label for="report-category">Kategori *</label>
+                        <select id="report-category" name="category" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="Fasilitas">Fasilitas Publik (Jalan, Lampu, Drainase)</option>
+                            <option value="Pungli">Dugaan Pungli / Pungutan Liar</option>
+                            <option value="Sosial">Masalah Sosial & Ketertiban</option>
+                            <option value="Lingkungan">Lingkungan (Sampah, Banjir)</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="report-title">Judul Laporan *</label>
+                        <input type="text" id="report-title" required placeholder="Contoh: Jalan Berlubang Parah">
+                    </div>
+                    <div class="form-field">
+                        <label for="report-description">Deskripsi Lengkap *</label>
+                        <textarea id="report-description" rows="4" required placeholder="Jelaskan detail kejadian..."></textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Lokasi & Bukti Visual</legend>
+                    <div class="form-field">
+                        <label>Koordinat GPS Presisi</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="report-gps" placeholder="Latitude, Longitude" readonly style="background:#eee;">
+                            <button type="button" id="btn-get-gps" class="btn btn-secondary btn-sm">📍 Ambil GPS</button>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label for="report-location">Alamat / Patokan *</label>
+                        <input type="text" id="report-location" required placeholder="Contoh: Depan Pasar Baru No. 12">
+                    </div>
+                    <div class="form-field">
+                        <label for="report-photo">Unggah Foto Masalah *</label>
+                        <input type="file" id="report-photo" accept="image/*" required>
+                        <img id="report-photo-preview" class="preview-img" alt="Pratinjau Foto Laporan">
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="btn btn-primary">Kirimkan Laporan</button>
+            </form>
+        </section>
+
+        <!-- DASBOR WARGA -->
+        <section id="dasbor-warga" class="page" style="display: none;">
+            <h2>Dasbor Pelapor (Masyarakat)</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Statistik Laporan Anda</h3>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar"><div id="bar-citizen-reported" class="chart-bar-fill"></div></div>
+                        <div class="chart-bar"><div id="bar-citizen-completed" class="chart-bar-fill"></div></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around; margin-top: 0.5rem;">
+                        <span class="chart-label">Proses</span>
+                        <span class="chart-label">Selesai</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Riwayat Laporan Saya</h3>
+                    <div id="citizen-reports-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASBOR PENEGAK HUKUM -->
+        <section id="dasbor-penegak" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Dasbor Operasional Penegak Hukum</h2>
+                <span class="status status-completed">Verifikasi Penegak Aktif</span>
+            </div>
+
+            <div class="card">
+                <h3>Statistik Penanganan Wilayah</h3>
+                <div class="grid-2">
+                    <div>
+                        <p>Perbandingan Status Laporan Warga:</p>
+                        <div class="chart-bar-container">
+                            <div class="chart-bar"><div id="bar-officer-todo" class="chart-bar-fill" style="background: var(--color-warning);"></div></div>
+                            <div class="chart-bar"><div id="bar-officer-done" class="chart-bar-fill" style="background: var(--color-success);"></div></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; margin-top: 0.5rem;">
+                            <span class="chart-label">Menunggu Penanganan</span>
+                            <span class="chart-label">Selesai Dibenahi</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Notifikasi Masuk</h4>
+                        <ul id="officer-notifications-list" style="padding-left: 1rem; color: var(--color-text-secondary);">
+                            <li>Sistem siap menerima laporan warga.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Daftar Masalah yang Membutuhkan Pembenahan</h3>
+            <div id="officer-report-list"></div>
+        </section>
+
+    </main>
+
+    <!-- MODAL AUTHENTICATION BARU -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <!-- Navigasi Tab Login -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <button type="button" class="auth-tab-btn active" id="tab-btn-citizen">Masuk Warga</button>
+                <button type="button" class="auth-tab-btn" id="tab-btn-officer">Masuk Penegak</button>
+            </div>
+
+            <!-- TAB 1: MASUK WARGA -->
+            <div id="tab-citizen-content">
+                <h3>Masuk / Daftar Akun Warga</h3>
+                <p><small style="color: var(--color-text-muted);">Gunakan akun Google atau isi formulir identitas asli kamu.</small></p>
+
+                <button type="button" id="btn-login-google" class="btn btn-secondary" style="width: 100%; margin-bottom: 1rem;">
+                    🌐 Masuk dengan Akun Google
+                </button>
+
+                <div style="text-align: center; margin-bottom: 1rem; color: var(--color-text-muted); font-size: 0.85rem;">— Atau dengan Identitas Asli —</div>
+
+                <form id="citizen-auth-form">
+                    <div class="form-field">
+                        <label for="citizen-name">Nama Lengkap Asli *</label>
+                        <input type="text" id="citizen-name" placeholder="Masukkan nama sesuai KTP" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="citizen-email">Alamat Email *</label>
+                        <input type="email" id="citizen-email" placeholder="contoh: warga@email.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Masuk Sebagai Warga</button>
+                </form>
+            </div>
+
+            <!-- TAB 2: MASUK PENEGAK -->
+            <div id="tab-officer-content" style="display: none;">
+                <h3>Akses Khusus Penegak Hukum</h3>
+                <p><small style="color: var(--color-text-muted);">Unggah identitas kartu petugas (Polisi/Damkar/dll) untuk memverifikasi kode penegak.</small></p>
+
+                <form id="officer-auth-form">
+                    <div class="form-field">
+                        <label for="officer-email">Email Petugas / Instansi *</label>
+                        <input type="email" id="officer-email" placeholder="contoh: mohammadarga043@gmail.com" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="officer-id-card">Scan Kartu Identitas Anggota (KTA) *</label>
+                        <input type="file" id="officer-id-card" accept="image/*" required>
+                        <img id="officer-card-preview" class="preview-img" alt="Pratinjau KTA">
+                    </div>
+                    <div class="form-field">
+                        <label for="officer-code">Kode Verifikasi / Kode Tetap Penegak *</label>
+                        <input type="password" id="officer-code" placeholder="Masukkan Kode Terverifikasi" required>
+                        <small style="color: var(--color-text-muted);">Gunakan Kode Uji: <b>44563891</b> atau Kode Tetap Penegak.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Verifikasi & Masuk Penegak</button>
+                </form>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-sm modal-close" style="width: 100%; margin-top: 1rem;">Batal</button>
+        </div>
+    </div>
+
+    <!-- MODAL PENYELESAIAN TUGAS PENEGAK -->
+    <div id="complete-modal" class="modal">
+        <div class="modal-content">
+            <h2>Penyelesaian Kondisi Lapangan</h2>
+            <p>Unggah foto bukti bahwa kondisi masalah telah berhasil dibenahi.</p>
+            <form id="complete-report-form">
+                <input type="hidden" id="complete-report-id">
+                <div class="form-field">
+                    <label for="complete-photo">Foto Bukti Setelah Dibenahi *</label>
+                    <input type="file" id="complete-photo" accept="image/*" required>
+                    <img id="complete-photo-preview" class="preview-img" alt="Pratinjau Foto Penanganan">
+                </div>
+                <div class="form-field">
+                    <label for="complete-notes">Catatan Perbaikan Penegak *</label>
+                    <textarea id="complete-notes" rows="3" required placeholder="Jelaskan tindakan pembenahan yang telah dilakukan..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Tandai Selesai</button>
+                <button type="button" class="btn btn-secondary btn-sm modal-close" style="width: 100%; margin-top: 0.5rem;">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            'use strict';
+
+            // KODE VALID PENEGAK
+            const VALID_OFFICER_CODES = ['44563891', 'PENEGAK-2026-FIXED'];
+
+            const STORAGE = {
+                REPORTS: 'laporkita_v3_reports',
+                SESSION: 'laporkita_v3_session'
+            };
+
+            const initialReports = [
+                {
+                    id: 'LK-2026-0001',
+                    category: 'Fasilitas',
+                    title: 'Jalan Utama Berlubang',
+                    description: 'Terdapat lubang lumayan dalam yang membahayakan pengendara.',
+                    location: 'Jl. Merdeka No. 45',
+                    gps: '-6.9174, 107.6191',
+                    photo: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" fill="%23ccc"><rect width="100%" height="100%"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23555">Foto Masalah Warga</text></svg>',
+                    status: 'reported',
+                    reporter: 'Warga Terverifikasi',
+                    fixedPhoto: null,
+                    fixedNotes: null
+                }
+            ];
+
+            function getStorage(key, fallback) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : fallback;
+                } catch(e) { return fallback; }
+            }
+
+            function setStorage(key, val) {
+                try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+            }
+
+            if (!localStorage.getItem(STORAGE.REPORTS)) {
+                setStorage(STORAGE.REPORTS, initialReports);
+            }
+
+            // ROUTER SPA
+            function navigateTo(targetId) {
+                const session = getStorage(STORAGE.SESSION, null);
+
+                // Penegak Hukum Tidak Punya Akses Buat Laporan
+                if (session && session.role === 'officer' && targetId === 'formulir-laporan') {
+                    alert('Halaman Buat Laporan khusus untuk Warga. Penegak difokuskan pada pembenahan.');
+                    targetId = 'dasbor-penegak';
+                }
+
+                document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+                const targetPage = document.getElementById(targetId) || document.getElementById('beranda');
+                targetPage.style.display = 'block';
+
+                document.querySelectorAll('#site-header nav a').forEach(a => {
+                    if (a.getAttribute('data-target') === targetId) a.setAttribute('aria-current', 'page');
+                    else a.removeAttribute('aria-current');
+                });
+
+                window.scrollTo(0, 0);
+                renderAll();
+            }
+
+            // FILE PREVIEW CONVERTER
+            function setupImagePreview(inputId, imgId) {
+                const input = document.getElementById(inputId);
+                const img = document.getElementById(imgId);
+                if (!input || !img) return;
+                input.addEventListener('change', () => {
+                    const file = input.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            img.src = e.target.result;
+                            img.style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // GPS GEOLOCATION
+            document.getElementById('btn-get-gps').addEventListener('click', () => {
+                const gpsInput = document.getElementById('report-gps');
+                if (navigator.geolocation) {
+                    gpsInput.value = "Mengambil GPS...";
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            gpsInput.value = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+                        },
+                        () => { gpsInput.value = "-6.91746, 107.61912 (GPS Aktif)"; }
+                    );
+                } else {
+                    gpsInput.value = "-6.91746, 107.61912 (GPS Default)";
+                }
+            });
+
+            // AUTHENTICATION TAB SYSTEM
+            function initAuth() {
+                const btnLoginModal = document.getElementById('btn-login-modal');
+                const authModal = document.getElementById('auth-modal');
+                const tabCitizenBtn = document.getElementById('tab-btn-citizen');
+                const tabOfficerBtn = document.getElementById('tab-btn-officer');
+                const tabCitizenContent = document.getElementById('tab-citizen-content');
+                const tabOfficerContent = document.getElementById('tab-officer-content');
+
+                tabCitizenBtn.addEventListener('click', () => {
+                    tabCitizenBtn.classList.add('active');
+                    tabOfficerBtn.classList.remove('active');
+                    tabCitizenContent.style.display = 'block';
+                    tabOfficerContent.style.display = 'none';
+                });
+
+                tabOfficerBtn.addEventListener('click', () => {
+                    tabOfficerBtn.classList.add('active');
+                    tabCitizenBtn.classList.remove('active');
+                    tabOfficerContent.style.display = 'block';
+                    tabCitizenContent.style.display = 'none';
+                });
+
+                btnLoginModal.addEventListener('click', () => {
+                    const session = getStorage(STORAGE.SESSION, null);
+                    if (session) {
+                        localStorage.removeItem(STORAGE.SESSION);
+                        alert('Anda telah Keluar.');
+                        updateAuthViews();
+                        navigateTo('beranda');
+                    } else {
+                        authModal.style.display = 'flex';
+                    }
+                });
+
+                // Google Auth Warga
+                document.getElementById('btn-login-google').addEventListener('click', () => {
+                    const userSession = { role: 'citizen', name: 'Warga (Google Auth)', email: 'warga.google@gmail.com' };
+                    setStorage(STORAGE.SESSION, userSession);
+                    authModal.style.display = 'none';
+                    updateAuthViews();
+                    navigateTo('dasbor-warga');
+                });
+
+                // Identitas Asli Form Warga
+                document.getElementById('citizen-auth-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('citizen-name').value;
+                    const email = document.getElementById('citizen-email').value;
+
+                    const userSession = { role: 'citizen', name: name, email: email };
+                    setStorage(STORAGE.SESSION, userSession);
+                    authModal.style.display = 'none';
+                    updateAuthViews();
+                    navigateTo('dasbor-warga');
+                });
+
+                // Form Login Penegak (Upload KTA + Kode)
+                document.getElementById('officer-auth-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('officer-email').value;
+                    const code = document.getElementById('officer-code').value.trim();
+
+                    if (VALID_OFFICER_CODES.includes(code)) {
+                        const officerSession = {
+                            role: 'officer',
+                            name: 'Petugas Penegak Hukum',
+                            email: email,
+                            verifiedCode: code
+                        };
+                        setStorage(STORAGE.SESSION, officerSession);
+                        authModal.style.display = 'none';
+                        updateAuthViews();
+                        alert('Kartu Anggota & Kode Berhasil Terverifikasi!');
+                        navigateTo('dasbor-penegak');
+                    } else {
+                        alert('Kode Verifikasi Tidak Valid! Masukkan kode 44563891 atau Kode Tetap.');
+                    }
+                });
+
+                // Close Modal
+                document.querySelectorAll('.modal-close').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                    });
+                });
+            }
+
+            function updateAuthViews() {
+                const session = getStorage(STORAGE.SESSION, null);
+                const btnLoginModal = document.getElementById('btn-login-modal');
+                const navCitizen = document.getElementById('nav-item-citizen-dash');
+                const navOfficer = document.getElementById('nav-item-officer-dash');
+                const navReport = document.getElementById('nav-item-report');
+
+                if (session) {
+                    btnLoginModal.textContent = `Keluar (${session.name})`;
+                    if (session.role === 'officer') {
+                        navOfficer.style.display = 'block';
+                        navCitizen.style.display = 'none';
+                        navReport.style.display = 'none';
+                    } else {
+                        navCitizen.style.display = 'block';
+                        navOfficer.style.display = 'none';
+                        navReport.style.display = 'block';
+                    }
+                } else {
+                    btnLoginModal.textContent = 'Masuk / Akun';
+                    navCitizen.style.display = 'none';
+                    navOfficer.style.display = 'none';
+                    navReport.style.display = 'block';
+                }
+            }
+
+            // FORM LAPORAN WARGA SUBMIT
+            document.getElementById('main-report-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const session = getStorage(STORAGE.SESSION, { name: 'Warga Anonim' });
+                const reports = getStorage(STORAGE.REPORTS, []);
+                const photoImg = document.getElementById('report-photo-preview');
+
+                const newReport = {
+                    id: `LK-2026-${String(reports.length + 1).padStart(4, '0')}`,
+                    category: document.getElementById('report-category').value,
+                    title: document.getElementById('report-title').value,
+                    description: document.getElementById('report-description').value,
+                    location: document.getElementById('report-location').value,
+                    gps: document.getElementById('report-gps').value || '-6.9174, 107.6191',
+                    photo: photoImg.src || 'https://via.placeholder.com/300x150?text=Foto+Laporan',
+                    status: 'reported',
+                    reporter: session.name,
+                    fixedPhoto: null,
+                    fixedNotes: null
+                };
+
+                reports.unshift(newReport);
+                setStorage(STORAGE.REPORTS, reports);
+
+                this.reset();
+                photoImg.style.display = 'none';
+                alert(`Laporan Berhasil Terkirim dengan Kode ID: ${newReport.id}`);
+                navigateTo('dasbor-warga');
+            });
+
+            // PENYELESAIAN PENEGAK
+            function openCompleteModal(reportId) {
+                document.getElementById('complete-report-id').value = reportId;
+                document.getElementById('complete-modal').style.display = 'flex';
+            }
+
+            document.getElementById('complete-report-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const reportId = document.getElementById('complete-report-id').value;
+                const reports = getStorage(STORAGE.REPORTS, []);
+                const photoImg = document.getElementById('complete-photo-preview');
+                const notes = document.getElementById('complete-notes').value;
+
+                const index = reports.findIndex(r => r.id === reportId);
+                if (index !== -1) {
+                    reports[index].status = 'completed';
+                    reports[index].fixedPhoto = photoImg.src;
+                    reports[index].fixedNotes = notes;
+                    setStorage(STORAGE.REPORTS, reports);
+                }
+
+                document.getElementById('complete-modal').style.display = 'none';
+                this.reset();
+                photoImg.style.display = 'none';
+                alert('Tindakan Pembenahan Berhasil Diunggah & Dinyatakan Selesai!');
+                renderAll();
+            });
+
+            // RENDER DATA & GRAPH VISUALIZATION
+            function renderAll() {
+                const reports = getStorage(STORAGE.REPORTS, []);
+                const completed = reports.filter(r => r.status === 'completed');
+                const pending = reports.filter(r => r.status === 'reported');
+
+                document.getElementById('stat-total').textContent = reports.length;
+                document.getElementById('stat-reported').textContent = pending.length;
+                document.getElementById('stat-completed').textContent = completed.length;
+                document.getElementById('stat-rate').textContent = reports.length ? `${Math.round((completed.length / reports.length) * 100)}%` : '0%';
+                document.getElementById('notif-count').textContent = pending.length;
+
+                // Render Pins Peta
+                const mapContainer = document.getElementById('map-container');
+                mapContainer.querySelectorAll('.map-pin').forEach(pin => pin.remove());
+                reports.forEach((r, idx) => {
+                    const pin = document.createElement('div');
+                    pin.className = 'map-pin';
+                    pin.style.background = r.status === 'completed' ? 'var(--color-success)' : 'var(--color-warning)';
+                    pin.style.top = `${20 + (idx * 25) % 60}%`;
+                    pin.style.left = `${15 + (idx * 35) % 70}%`;
+                    pin.textContent = `${r.id} (${r.category})`;
+                    mapContainer.appendChild(pin);
+                });
+
+                // Update Grafik Bar Penegak
+                const maxVal = Math.max(reports.length, 1);
+                document.getElementById('bar-officer-todo').style.height = `${(pending.length / maxVal) * 100}%`;
+                document.getElementById('bar-officer-done').style.height = `${(completed.length / maxVal) * 100}%`;
+
+                // Update Grafik Bar Warga
+                document.getElementById('bar-citizen-reported').style.height = `${(pending.length / maxVal) * 100}%`;
+                document.getElementById('bar-citizen-completed').style.height = `${(completed.length / maxVal) * 100}%`;
+
+                // Render Notifikasi Penegak
+                const notifList = document.getElementById('officer-notifications-list');
+                if (pending.length > 0) {
+                    notifList.innerHTML = pending.map(r => `<li><b>Laporan Baru (${r.id}):</b> ${r.title} di lokasi ${r.location}</li>`).join('');
+                } else {
+                    notifList.innerHTML = '<li>Tidak ada laporan baru yang memerlukan penanganan.</li>';
+                }
+
+                // Render List Dasbor Warga
+                const citizenList = document.getElementById('citizen-reports-list');
+                citizenList.innerHTML = reports.map(r => `
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between;">
+                            <h4>${r.title} (${r.id})</h4>
+                            <span class="status status-${r.status}">${r.status.toUpperCase()}</span>
+                        </div>
+                        <p>${r.description}</p>
+                        <p><small>📍 ${r.location} | GPS: ${r.gps}</small></p>
+                        <img src="${r.photo}" style="max-height:100px; border-radius:6px;" alt="Foto Pengaduan">
+                        ${r.status === 'completed' ? `
+                            <div style="margin-top:0.5rem; padding:0.5rem; background:var(--color-success-bg); border-radius:6px;">
+                                <p style="color:var(--color-success); font-weight:bold; margin:0;">Bukti Kondisi Selesai Dibenahi Penegak:</p>
+                                <p style="margin:0;"><small>${r.fixedNotes}</small></p>
+                                <img src="${r.fixedPhoto}" style="max-height:100px; border-radius:6px; margin-top:4px;" alt="Foto Kondisi Selesai">
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+
+                // Render List Dasbor Penegak
+                const officerList = document.getElementById('officer-report-list');
+                officerList.innerHTML = reports.map(r => `
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h3>${r.title} <span class="status status-${r.status}">${r.status.toUpperCase()}</span></h3>
+                                <p><small>Pelapor: ${r.reporter} | Lokasi: ${r.location} (GPS: ${r.gps})</small></p>
+                            </div>
+                            ${r.status === 'reported' ? `<button class="btn btn-primary btn-sm btn-complete-trigger" data-id="${r.id}">Dibenahi & Unggah Bukti</button>` : ''}
+                        </div>
+                        <p>${r.description}</p>
+                        <div style="display:flex; gap:1rem;">
+                            <div>
+                                <small>Foto Kondisi Masalah:</small><br>
+                                <img src="${r.photo}" style="max-height:120px; border-radius:6px;" alt="Foto Masalah">
+                            </div>
+                            ${r.fixedPhoto ? `
+                                <div>
+                                    <small>Foto Dibenahi Penegak:</small><br>
+                                    <img src="${r.fixedPhoto}" style="max-height:120px; border-radius:6px;" alt="Foto Perbaikan">
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.btn-complete-trigger').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        openCompleteModal(id);
+                    });
+                });
+            }
+
+            // LINK ROUTING CLICK
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.nav-link');
+                if (link) {
+                    e.preventDefault();
+                    const target = link.getAttribute('data-target');
+                    window.location.hash = target;
+                    navigateTo(target);
+                }
+            });
+
+            // INITIALIZATION
+            document.addEventListener('DOMContentLoaded', () => {
+                setupImagePreview('report-photo', 'report-photo-preview');
+                setupImagePreview('officer-id-card', 'officer-card-preview');
+                setupImagePreview('complete-photo', 'complete-photo-preview');
+                initAuth();
+                updateAuthViews();
+                
+                const hash = window.location.hash.replace('#', '') || 'beranda';
+                navigateTo(hash);
+            });
+        })();
+    </script>
+</body>
+</html>
