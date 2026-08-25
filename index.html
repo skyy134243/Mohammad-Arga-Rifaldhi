@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAPORKITA - Platform Pengaduan Wilayah</title>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0f5d39 0%, #16794a 50%, #22995e 100%);
+            --accent-gradient: linear-gradient(135deg, #ff9f43 0%, #ff6200 100%);
+            --color-primary: #16794a;
+            --color-primary-dark: #0f5d39;
+            --color-primary-light: #e8f5ee;
+            --color-background: #f0f4f2;
+            --color-surface: #ffffff;
+            --color-text: #17221c;
+            --color-text-secondary: #46534c;
+            --color-border: #dce4df;
+            --shadow-card: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --container-width: 1240px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; background: var(--color-background); color: var(--color-text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; }
+        main > section { max-width: var(--container-width); margin-inline: auto; padding: 1.5rem 1rem; }
+        
+        /* HEADER */
+        #site-header { position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1.5rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 2px solid var(--color-primary-light); flex-wrap: wrap; gap: 0.8rem; }
+        .brand { font-size: 1.4rem; font-weight: 900; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        nav { order: 3; width: 100%; overflow-x: auto; }
+        nav ul { display: flex; gap: 0.4rem; list-style: none; margin: 0; padding: 0; white-space: nowrap; }
+        nav a { padding: 0.5rem 1rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem; color: var(--color-text-secondary); text-decoration: none; }
+        nav a:hover, nav a[aria-current="page"] { background: var(--color-primary-light); color: var(--color-primary-dark); }
+        .announcement-bar { background: #17221c; color: #ff9f43; font-size: 0.85rem; padding: 0.4rem 1rem; font-weight: 600; text-align: center; }
+
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.7rem 1.3rem; border-radius: var(--radius-md); border: none; font-weight: 700; cursor: pointer; text-decoration: none; gap: 0.5rem; font-size: 0.95rem; }
+        .btn-primary { background: var(--accent-gradient); color: white; }
+        .btn-secondary { background: var(--color-primary-light); color: var(--color-primary-dark); }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.85rem; }
+
+        /* CARDS & LAYOUT */
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+        .card { background: white; border-radius: var(--radius-lg); padding: 1.4rem; box-shadow: var(--shadow-card); margin-bottom: 1.2rem; }
+        .hero-banner { background: var(--primary-gradient); color: white; border-radius: var(--radius-lg); padding: 3rem 1.5rem; text-align: center; }
+
+        /* FORM STYLING & PERNIK-PERNIK LAPORAN */
+        .form-field { margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
+        .form-row { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        input, select, textarea { padding: 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; width: 100%; background: #fbfdfc; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--color-primary); }
+        fieldset { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.2rem; margin-bottom: 1.2rem; background: white; }
+        legend { font-weight: 700; color: var(--color-primary-dark); padding: 0 0.5rem; }
+        
+        .radio-group, .checkbox-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.3rem; }
+        .radio-label, .checkbox-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; cursor: pointer; background: var(--color-background); padding: 0.5rem 0.8rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); }
+        .radio-label input, .checkbox-label input { width: auto; margin: 0; }
+
+        /* MODAL AUTH ALA GITHUB */
+        .modal { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); padding: 1rem; }
+        .modal-content { background: white; padding: 1.8rem; border-radius: var(--radius-lg); max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .auth-nav { display: flex; border-bottom: 2px solid var(--color-border); margin-bottom: 1.2rem; }
+        .auth-nav-btn { flex: 1; padding: 0.7rem; border: none; background: none; font-weight: bold; cursor: pointer; color: var(--color-text-secondary); }
+        .auth-nav-btn.active { border-bottom: 3px solid var(--color-primary); color: var(--color-primary); }
+        .user-badge { font-weight: bold; color: var(--color-primary-dark); margin-right: 0.5rem; }
+
+        /* STATUS BADGES */
+        .status { padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .status-reported { background: #fff3cd; color: #856404; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .preview-img { max-width: 100%; max-height: 150px; object-fit: cover; border-radius: var(--radius-md); margin-top: 0.5rem; display: none; }
+
+        footer { background: #17221c; color: #a4b3ab; text-align: center; padding: 2rem 1rem; margin-top: 3rem; font-size: 0.85rem; }
+
+        @media (min-width: 768px) {
+            #site-header { flex-wrap: nowrap; gap: 0; }
+            nav { order: 0; width: auto; }
+            .grid-2 { grid-template-columns: 1fr 1fr; }
+            .grid-4 { grid-template-columns: repeat(4, 1fr); }
+            .form-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="announcement-bar">📢 Platform Pengaduan Wilayah Resmi - Buat Akun & Pantau Laporan Real-Time</div>
+
+    <header id="site-header">
+        <div class="brand">LAPORKITA</div>
+        <nav>
+            <ul>
+                <li><a href="#beranda" class="nav-link" data-target="beranda">Beranda</a></li>
+                <li id="nav-item-report"><a href="#formulir-laporan" class="nav-link" data-target="formulir-laporan">Buat Laporan</a></li>
+                <li id="nav-item-citizen-dash" style="display: none;"><a href="#dasbor-warga" class="nav-link" data-target="dasbor-warga">Laporan Saya</a></li>
+            </ul>
+        </nav>
+        <div id="auth-header-action">
+            <button type="button" id="btn-open-auth" class="btn btn-secondary btn-sm">Masuk / Daftar Akun</button>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <!-- BERANDA -->
+        <section id="beranda" class="page">
+            <div class="hero-banner">
+                <h1>Lapor Masalah Wilayah Lebih Mudah & Transparan</h1>
+                <p>Daftarkan akun kamu seperti di GitHub, kirim laporan lengkap dengan lokasi GPS & bukti foto, lalu pantau proses penanganannya.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#formulir-laporan" class="nav-link btn btn-primary" data-target="formulir-laporan">📝 Buat Pengaduan Lengkap</a>
+                </div>
+            </div>
+
+            <h2>Statistik Laporan</h2>
+            <div class="grid-4">
+                <div class="card"><h3>Total Pengaduan</h3><h2 id="stat-total">0</h2></div>
+                <div class="card"><h3>Proses Verifikasi</h3><h2 id="stat-reported">0</h2></div>
+                <div class="card"><h3>Selesai Ditangani</h3><h2 id="stat-completed">0</h2></div>
+                <div class="card"><h3>Persentase Selesai</h3><h2 id="stat-rate">0%</h2></div>
+            </div>
+        </section>
+
+        <!-- FORMULIR LAPORAN SUPER LENGKAP (PRENTILAN PENGADUAN) -->
+        <section id="formulir-laporan" class="page" style="display: none;">
+            <h2>Formulir Laporan Pengaduan Masyarakat</h2>
+            <p>Lengkapi informasi laporan dengan rinci agar mempercepat proses verifikasi oleh tim penegak/petugas.</p>
+            
+            <form id="main-report-form">
+                
+                <!-- PRENTILAN 1: TIPE LAPORAN & PRIVASI -->
+                <fieldset>
+                    <legend>1. Klasifikasi & Privasi Laporan</legend>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="report-category">Kategori Utama *</label>
+                            <select id="report-category" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="Fasilitas Publik">Fasilitas Publik (Jalan, Lampu, Jembatan)</option>
+                                <option value="Kebersihan & Lingkungan">Kebersihan & Lingkungan (Sampah, Drainase)</option>
+                                <option value="Ketertiban & Pungli">Ketertiban Umum / Dugaan Pungli</option>
+                                <option value="Layanan Administrasi">Pelayanan Administrasi Desa/Kelurahan</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="report-sub-category">Sub-Kategori Spesifik</label>
+                            <input type="text" id="report-sub-category" placeholder="Contoh: Aspal Amblas / Pungutan Parkir Liar">
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Tingkat Urgensi Laporan *</label>
+                        <div class="radio-group">
+                            <label class="radio-label"><input type="radio" name="urgency" value="Biasa" checked> 🟢 Biasa (Standard)</label>
+                            <label class="radio-label"><input type="radio" name="urgency" value="Penting"> 🟡 Penting (Perlu Perhatian)</label>
+                            <label class="radio-label"><input type="radio" name="urgency" value="Darurat"> 🔴 Darurat (Bahaya Keselamatan)</label>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label>Opsi Kerahasiaan Identitas (Anonimitas)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="is-anonymous"> 🔒 Rahasiakan Nama Saya (Lapor secara Anonim)</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- PRENTILAN 2: DETAIL KEJADIAN & LOKASI GPS -->
+                <fieldset>
+                    <legend>2. Detail Kejadian & Lokasi Presisi</legend>
+                    <div class="form-field">
+                        <label for="report-title">Judul Laporan Singkat *</label>
+                        <input type="text" id="report-title" required placeholder="Contoh: Lampu Jalan Utama Rusak Parah">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="report-description">Deskripsi Kronologi Kejadian *</label>
+                        <textarea id="report-description" rows="4" required placeholder="Jelaskan detail waktu, kronologi, serta dampak yang dirasakan warga..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="report-date">Tanggal & Waktu Kejadian</label>
+                            <input type="datetime-local" id="report-date">
+                        </div>
+                        <div class="form-field">
+                            <label>Koordinat GPS Otomatis</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="report-gps" placeholder="Latitude, Longitude" readonly style="background:#eee;">
+                                <button type="button" id="btn-get-gps" class="btn btn-secondary btn-sm">📍 Ambil GPS</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="report-location">Alamat Detail / Patokan Lokasi *</label>
+                        <input type="text" id="report-location" required placeholder="Contoh: RT 03/RW 02 Depan Warung Bu Sri, Kel. Sukamaju">
+                    </div>
+                </fieldset>
+
+                <!-- PRENTILAN 3: BUKTI FISIK & PERNYATAAN -->
+                <fieldset>
+                    <legend>3. Bukti Visual & Pernyataan</legend>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label for="report-photo">Foto Bukti Masalah (Utama) *</label>
+                            <input type="file" id="report-photo" accept="image/*" required>
+                            <img id="report-photo-preview" class="preview-img" alt="Foto Utama">
+                        </div>
+                        <div class="form-field">
+                            <label for="report-attachment">File Lampiran Pendukung (Opsional)</label>
+                            <input type="file" id="report-attachment">
+                            <small style="color: #666;">Bisa upload dokumen PDF/Foto Tambahan.</small>
+                        </div>
+                    </div>
+
+                    <div class="form-field" style="margin-top: 1rem;">
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" id="agree-terms" required> ⚖️ Saya menyatakan bahwa informasi pengaduan ini adalah benar dan dapat dipertanggungjawabkan.</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">🚀 Kirimkan Laporan Pengaduan</button>
+            </form>
+        </section>
+
+        <!-- DASBOR WARGA -->
+        <section id="dasbor-warga" class="page" style="display: none;">
+            <h2>Laporan Pengaduan Saya</h2>
+            <div id="citizen-reports-list"></div>
+        </section>
+
+    </main>
+
+    <!-- MODAL AUTHENTICATION (REGISTER & LOGIN ALA GITHUB) -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <div class="auth-nav">
+                <button type="button" class="auth-nav-btn active" id="tab-login-btn">Masuk (Login)</button>
+                <button type="button" class="auth-nav-btn" id="tab-register-btn">Buat Akun (Register)</button>
+            </div>
+
+            <!-- FORM LOGIN -->
+            <form id="form-login">
+                <h3>Masuk ke LAPORKITA</h3>
+                <div class="form-field">
+                    <label for="login-email">Email / Username</label>
+                    <input type="text" id="login-email" required placeholder="nama@email.com atau username">
+                </div>
+                <div class="form-field">
+                    <label for="login-password">Kata Sandi (Password)</label>
+                    <input type="password" id="login-password" required placeholder="Masukkan password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Masuk Akun</button>
+            </form>
+
+            <!-- FORM REGISTER (MEMBUAT AKUN BARU ALA GITHUB) -->
+            <form id="form-register" style="display: none;">
+                <h3>Pendaftaran Akun Baru</h3>
+                <div class="form-field">
+                    <label for="reg-fullname">Nama Lengkap Asli *</label>
+                    <input type="text" id="reg-fullname" required placeholder="Sesuai KTP">
+                </div>
+                <div class="form-field">
+                    <label for="reg-username">Username *</label>
+                    <input type="text" id="reg-username" required placeholder="Contoh: ahmad_lapor">
+                </div>
+                <div class="form-field">
+                    <label for="reg-email">Alamat Email *</label>
+                    <input type="email" id="reg-email" required placeholder="email@domain.com">
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="reg-password">Password *</label>
+                        <input type="password" id="reg-password" minlength="6" required placeholder="Min. 6 Karakter">
+                    </div>
+                    <div class="form-field">
+                        <label for="reg-confirm-password">Konfirmasi Password *</label>
+                        <input type="password" id="reg-confirm-password" minlength="6" required placeholder="Ulangi Password">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Daftar Akun Baru</button>
+            </form>
+
+            <button type="button" class="btn btn-secondary btn-sm modal-close" style="width: 100%; margin-top: 1rem; border:1px solid #ccc;">Batal</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 LAPORKITA - Sistem Informasi Pengaduan & Layanan Aspirasi Warga.</p>
+    </footer>
+
+    <script>
+        (() => {
+            'use strict';
+            const STORAGE = { USERS: 'laporkita_users', SESSION: 'laporkita_session', REPORTS: 'laporkita_reports' };
+
+            // Data Awal Mockup jika Kosong
+            function getStorage(key, fallback) {
+                try { const item = localStorage.getItem(key); return item ? JSON.parse(item) : fallback; } catch(e) { return fallback; }
+            }
+            function setStorage(key, val) {
+                try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+            }
+
+            // Inisialisasi awal
+            if (!localStorage.getItem(STORAGE.USERS)) {
+                setStorage(STORAGE.USERS, [{ fullname: 'Warga Contoh', username: 'warga1', email: 'warga@test.com', password: 'password123' }]);
+            }
+            if (!localStorage.getItem(STORAGE.REPORTS)) setStorage(STORAGE.REPORTS, []);
+
+            // Alur Halaman (SPA Navigation)
+            function navigateTo(targetId) {
+                document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+                const targetPage = document.getElementById(targetId) || document.getElementById('beranda');
+                targetPage.style.display = 'block';
+                document.querySelectorAll('#site-header nav a').forEach(a => {
+                    if (a.getAttribute('data-target') === targetId) a.setAttribute('aria-current', 'page');
+                    else a.removeAttribute('aria-current');
+                });
+                window.scrollTo(0, 0);
+                renderStatsAndReports();
+            }
+
+            // Modals & Tab Switch (Login / Register Ala GitHub)
+            const authModal = document.getElementById('auth-modal');
+            const tabLoginBtn = document.getElementById('tab-login-btn');
+            const tabRegBtn = document.getElementById('tab-register-btn');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+
+            tabLoginBtn.addEventListener('click', () => {
+                tabLoginBtn.classList.add('active'); tabRegBtn.classList.remove('active');
+                formLogin.style.display = 'block'; formRegister.style.display = 'none';
+            });
+
+            tabRegBtn.addEventListener('click', () => {
+                tabRegBtn.classList.add('active'); tabLoginBtn.classList.remove('active');
+                formRegister.style.display = 'block'; formLogin.style.display = 'none';
+            });
+
+            document.getElementById('btn-open-auth').addEventListener('click', () => {
+                const session = getStorage(STORAGE.SESSION, null);
+                if (session) {
+                    // Jika sudah login, fungsi klik tombol ini jadi Logout
+                    localStorage.removeItem(STORAGE.SESSION);
+                    alert('Anda telah berhasil keluar (Logout).');
+                    updateAuthUI();
+                    navigateTo('beranda');
+                } else {
+                    authModal.style.display = 'flex';
+                }
+            });
+
+            document.querySelectorAll('.modal-close').forEach(b => {
+                b.addEventListener('click', () => authModal.style.display = 'none');
+            });
+
+            // LOGIKA REGISTER
+            formRegister.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const pass = document.getElementById('reg-password').value;
+                const confirmPass = document.getElementById('reg-confirm-password').value;
+                if (pass !== confirmPass) {
+                    alert('Konfirmasi password tidak cocok!');
+                    return;
+                }
+
+                const users = getStorage(STORAGE.USERS, []);
+                const email = document.getElementById('reg-email').value.trim();
+                const username = document.getElementById('reg-username').value.trim();
+
+                if (users.find(u => u.email === email || u.username === username)) {
+                    alert('Email atau Username sudah terdaftar! Silakan Login.');
+                    return;
+                }
+
+                const newUser = {
+                    fullname: document.getElementById('reg-fullname').value,
+                    username: username,
+                    email: email,
+                    password: pass
+                };
+                users.push(newUser);
+                setStorage(STORAGE.USERS, users);
+                
+                // Auto login setelah register
+                setStorage(STORAGE.SESSION, { fullname: newUser.fullname, username: newUser.username, email: newUser.email });
+                alert('Pendaftaran Akun Berhasil! Selamat datang.');
+                authModal.style.display = 'none';
+                formRegister.reset();
+                updateAuthUI();
+                navigateTo('dasbor-warga');
+            });
+
+            // LOGIKA LOGIN
+            formLogin.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const inputId = document.getElementById('login-email').value.trim();
+                const pass = document.getElementById('login-password').value;
+                const users = getStorage(STORAGE.USERS, []);
+
+                const user = users.find(u => (u.email === inputId || u.username === inputId) && u.password === pass);
+                if (user) {
+                    setStorage(STORAGE.SESSION, { fullname: user.fullname, username: user.username, email: user.email });
+                    alert(`Selamat datang kembali, ${user.fullname}!`);
+                    authModal.style.display = 'none';
+                    formLogin.reset();
+                    updateAuthUI();
+                    navigateTo('dasbor-warga');
+                } else {
+                    alert('Username/Email atau Password salah!');
+                }
+            });
+
+            function updateAuthUI() {
+                const session = getStorage(STORAGE.SESSION, null);
+                const headerAction = document.getElementById('auth-header-action');
+                const citizenDashNav = document.getElementById('nav-item-citizen-dash');
+
+                if (session) {
+                    headerAction.innerHTML = `
+                        <span class="user-badge">👤 ${session.fullname}</span>
+                        <button type="button" id="btn-open-auth" class="btn btn-secondary btn-sm">Keluar</button>
+                    `;
+                    citizenDashNav.style.display = 'block';
+                } else {
+                    headerAction.innerHTML = `
+                        <button type="button" id="btn-open-auth" class="btn btn-secondary btn-sm">Masuk / Daftar Akun</button>
+                    `;
+                    citizenDashNav.style.display = 'none';
+                }
+
+                document.getElementById('btn-open-auth').addEventListener('click', () => {
+                    const activeSession = getStorage(STORAGE.SESSION, null);
+                    if (activeSession) {
+                        localStorage.removeItem(STORAGE.SESSION);
+                        alert('Anda telah keluar.');
+                        updateAuthUI();
+                        navigateTo('beranda');
+                    } else {
+                        authModal.style.display = 'flex';
+                    }
+                });
+            }
+
+            // PRENTILAN LAPORAN: Deteksi GPS & Preview Foto
+            document.getElementById('btn-get-gps').addEventListener('click', () => {
+                const inputGps = document.getElementById('report-gps');
+                inputGps.value = "Mendeteksi Koordinat...";
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (p) => inputGps.value = `${p.coords.latitude.toFixed(5)}, ${p.coords.longitude.toFixed(5)}`,
+                        () => inputGps.value = "-6.91746, 107.61912 (GPS)"
+                    );
+                } else inputGps.value = "-6.91746, 107.61912 (GPS)";
+            });
+
+            const photoInput = document.getElementById('report-photo');
+            const photoPreview = document.getElementById('report-photo-preview');
+            photoInput.addEventListener('change', () => {
+                const file = photoInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => { photoPreview.src = e.target.result; photoPreview.style.display = 'block'; };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // SUBMIT FORM LAPORAN DENGAN PRENTILAN LENGKAP
+            document.getElementById('main-report-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const session = getStorage(STORAGE.SESSION, null);
+                
+                if (!session) {
+                    alert('Anda harus Masuk / Membuat Akun terlebih dahulu sebelum membuat laporan!');
+                    authModal.style.display = 'flex';
+                    return;
+                }
+
+                const reports = getStorage(STORAGE.REPORTS, []);
+                const isAnon = document.getElementById('is-anonymous').checked;
+                const urgencyVal = document.querySelector('input[name="urgency"]:checked').value;
+
+                const newReport = {
+                    id: `LK-${Date.now().toString().slice(-6)}`,
+                    category: document.getElementById('report-category').value,
+                    subCategory: document.getElementById('report-sub-category').value || '-',
+                    urgency: urgencyVal,
+                    isAnonymous: isAnon,
+                    reporterName: isAnon ? 'Warga Anonim' : session.fullname,
+                    reporterEmail: session.email,
+                    title: document.getElementById('report-title').value,
+                    description: document.getElementById('report-description').value,
+                    incidentDate: document.getElementById('report-date').value || new Date().toLocaleString(),
+                    gps: document.getElementById('report-gps').value || 'Tidak Ada GPS',
+                    location: document.getElementById('report-location').value,
+                    photo: photoPreview.src || '',
+                    status: 'reported'
+                };
+
+                reports.unshift(newReport);
+                setStorage(STORAGE.REPORTS, reports);
+
+                this.reset();
+                photoPreview.style.display = 'none';
+                alert('Laporan pengaduan berhasil terkirim!');
+                navigateTo('dasbor-warga');
+            });
+
+            function renderStatsAndReports() {
+                const reports = getStorage(STORAGE.REPORTS, []);
+                const session = getStorage(STORAGE.SESSION, null);
+
+                document.getElementById('stat-total').textContent = reports.length;
+                const pending = reports.filter(r => r.status === 'reported').length;
+                const completed = reports.filter(r => r.status === 'completed').length;
+                document.getElementById('stat-reported').textContent = pending;
+                document.getElementById('stat-completed').textContent = completed;
+                document.getElementById('stat-rate').textContent = reports.length ? `${Math.round((completed / reports.length) * 100)}%` : '0%';
+
+                // Render Laporan Saya di Dasbor Warga
+                const citizenList = document.getElementById('citizen-reports-list');
+                if (!session) {
+                    citizenList.innerHTML = '<p>Silakan masuk akun terlebih dahulu untuk melihat riwayat laporan kamu.</p>';
+                    return;
+                }
+
+                const myReports = reports.filter(r => r.reporterEmail === session.email);
+                if (myReports.length === 0) {
+                    citizenList.innerHTML = '<p>Kamu belum memiliki riwayat pengaduan. Buat laporan pertama kamu!</p>';
+                } else {
+                    citizenList.innerHTML = myReports.map(r => `
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
+                                <div>
+                                    <h3 style="margin:0;">${r.title}</h3>
+                                    <small style="color:#666;">ID: ${r.id} | Ditulis oleh: ${r.reporterName}</small>
+                                </div>
+                                <span class="status status-${r.status}">${r.status === 'reported' ? 'Diproses / Menunggu' : 'Selesai'}</span>
+                            </div>
+                            <hr style="border:none; border-top:1px solid #eee; margin:0.8rem 0;">
+                            <p><strong>Kategori:</strong> ${r.category} (${r.subCategory}) | <strong>Urgensi:</strong> ${r.urgency}</p>
+                            <p>${r.description}</p>
+                            <p><small>📍 Lokasi: ${r.location} (GPS: ${r.gps})</small></p>
+                            ${r.photo ? `<img src="${r.photo}" style="max-width:200px; border-radius:8px; margin-top:0.5rem;" alt="Foto">` : ''}
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Navigation Links Listener
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.nav-link');
+                if (link) {
+                    e.preventDefault();
+                    navigateTo(link.getAttribute('data-target'));
+                }
+            });
+
+            // Initial Load
+            updateAuthUI();
+                navigateTo('beranda');
+        })();
+    </script>
+</body>
+</html>
