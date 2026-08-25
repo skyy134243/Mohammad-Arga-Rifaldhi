@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LAPORKITA - Platform partisipasi masyarakat untuk melaporkan dan memantau permasalahan lingkungan dan fasilitas publik.">
+    <title>LAPORKITA</title>
+    
+    <style>
+        /* =========================================================
+           LAPORKITA - Pure CSS UI System
+           ========================================================= */
+
+        :root {
+            --color-primary: #16794a;
+            --color-primary-dark: #0f5d39;
+            --color-primary-light: #e8f5ee;
+
+            --color-background: #f5f7f6;
+            --color-surface: #ffffff;
+            --color-surface-soft: #f8faf9;
+
+            --color-text: #17221c;
+            --color-text-secondary: #46534c;
+            --color-text-muted: #718078;
+
+            --color-border: #dce4df;
+            --color-border-strong: #c7d2cc;
+
+            --color-success: #16804b;
+            --color-success-bg: #e7f6ed;
+
+            --color-warning: #a56a00;
+            --color-warning-bg: #fff5d9;
+
+            --color-info: #1769aa;
+            --color-info-bg: #e8f2fb;
+
+            --color-danger: #b43a3a;
+            --color-danger-bg: #fbeaea;
+
+            --color-closed: #69736e;
+            --color-closed-bg: #edf0ee;
+
+            --color-white: #ffffff;
+            --color-black: #111713;
+
+            --shadow-sm: 0 1px 3px rgba(20, 38, 29, 0.06);
+            --shadow-md: 0 6px 20px rgba(20, 38, 29, 0.08);
+            --shadow-lg: 0 12px 32px rgba(20, 38, 29, 0.10);
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 22px;
+
+            --container-width: 1240px;
+
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+
+            --transition-fast: 120ms ease;
+            --transition-normal: 180ms ease;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ul, ol { margin: 0; }
+        ul, ol { padding: 0; list-style: none; }
+        button, input, select, textarea { font: inherit; border-radius: var(--radius-sm); }
+        button { cursor: pointer; border: 1px solid transparent; }
+        img, svg, video { display: block; max-width: 100%; height: auto; }
+        a { color: inherit; text-decoration: none; }
+
+        body {
+            min-width: 320px;
+            background: var(--color-background);
+            color: var(--color-text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        main { width: 100%; }
+        main > section, main > .page {
+            max-width: var(--container-width);
+            margin-inline: auto;
+            padding: var(--space-12) var(--space-6);
+        }
+
+        .page { scroll-margin-top: 5rem; animation: fadeIn 200ms ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header { margin-bottom: var(--space-8); }
+        .page-header p { max-width: 720px; }
+        strong { font-weight: 700; }
+
+        h1, h2, h3, h4, h5, h6 { color: var(--color-text); font-weight: 700; line-height: 1.2; }
+        h1 { font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.035em; }
+        h2 { font-size: clamp(1.4rem, 2vw, 2rem); letter-spacing: -0.02em; }
+        h3 { font-size: 1.05rem; }
+        p { color: var(--color-text-secondary); }
+
+        .platform-label {
+            margin-bottom: var(--space-3);
+            color: var(--color-primary);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+
+        /* HEADER & NAVIGATION */
+        .brand a { display: inline-flex; align-items: center; gap: var(--space-3); font-size: 1.15rem; font-weight: 800; }
+        .logo-placeholder {
+            display: inline-grid; width: 2.25rem; height: 2.25rem; place-items: center;
+            border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+            background: var(--color-surface-soft); color: var(--color-primary); font-size: 0.75rem; font-weight: 800;
+        }
+
+        #site-header {
+            position: sticky; top: 0; z-index: 100;
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+            min-height: 4.5rem; padding: 0 var(--space-6);
+            border-bottom: 1px solid var(--color-border); background: rgba(255, 255, 255, 0.96);
+            box-shadow: var(--shadow-sm);
+        }
+
+        #site-header .header-account { justify-self: end; }
+        #site-header nav ul { display: flex; align-items: center; gap: var(--space-2); }
+        #site-header nav a {
+            display: inline-flex; align-items: center; min-height: 2.5rem; padding: 0 var(--space-4);
+            border-radius: var(--radius-md); color: var(--color-text-secondary); font-size: 0.9375rem; font-weight: 600;
+            transition: background-color var(--transition-fast), color var(--transition-fast);
+        }
+        #site-header nav a:hover, #site-header nav a[aria-current="page"] {
+            background: var(--color-primary-light); color: var(--color-primary-dark);
+        }
+
+        /* HERO & BUTTONS */
+        #beranda > .page-header {
+            padding: clamp(3rem, 7vw, 6rem) clamp(1.5rem, 5vw, 5rem);
+            border: 1px solid var(--color-border); border-radius: var(--radius-xl);
+            background: var(--color-surface); box-shadow: var(--shadow-md);
+        }
+
+        .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-8); }
+        .hero-actions a, .form-actions button, form > button, .report-category footer a, .btn-auth-trigger {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-height: 2.75rem; padding: 0.65rem 1.1rem;
+            border: 1px solid var(--color-primary); border-radius: var(--radius-md);
+            background: var(--color-primary); color: var(--color-white); font-weight: 700;
+            transition: background-color var(--transition-fast), border-color var(--transition-fast);
+        }
+        .hero-actions a:hover, .form-actions button:hover, .report-category footer a:hover {
+            background: var(--color-primary-dark); border-color: var(--color-primary-dark);
+        }
+        .hero-actions a:nth-child(2), .form-actions button[type="reset"] {
+            background: var(--color-surface); color: var(--color-primary-dark); border-color: var(--color-border-strong);
+        }
+
+        /* CATEGORIES & CARDS */
+        .report-category-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-5); }
+        .report-category {
+            display: flex; flex-direction: column; padding: var(--space-6);
+            border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+            background: var(--color-surface); box-shadow: var(--shadow-sm);
+        }
+        .report-category h3 { margin-bottom: var(--space-4); }
+        .report-category ul { display: grid; gap: var(--space-2); margin-bottom: var(--space-6); }
+        .report-category li { position: relative; padding-left: 1rem; color: var(--color-text-secondary); font-size: 0.9rem; }
+        .report-category li::before { content: "•"; position: absolute; left: 0; color: var(--color-primary); }
+        .report-category footer { margin-top: auto; }
+        .report-category footer a { width: 100%; }
+
+        /* STATS & FORMS */
+        .statistics-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); }
+        .statistics-summary article { padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+        .statistics-summary data { display: block; margin-top: var(--space-2); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; }
+
+        input, select, textarea {
+            width: 100%; border: 1px solid var(--color-border-strong); background: var(--color-surface);
+            color: var(--color-text); outline: none; padding: 0.6rem 0.8rem;
+        }
+        textarea { min-height: 8rem; resize: vertical; }
+        input:focus, select:focus, textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
+        input[type="checkbox"], input[type="radio"] { width: auto; accent-color: var(--color-primary); }
+
+        fieldset { margin: 0 0 var(--space-6); padding: var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+        legend { padding-inline: var(--space-3); font-weight: 750; }
+        .form-field { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
+
+        .latest-report-list { display: grid; gap: var(--space-5); }
+        .report-card { padding: var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); }
+        .report-img { max-width: 100%; max-height: 250px; object-fit: cover; border-radius: var(--radius-md); margin-top: var(--space-3); }
+
+        .status { display: inline-flex; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+        .status-reported { background: var(--color-warning-bg); color: var(--color-warning); }
+        .status-completed { background: var(--color-success-bg); color: var(--color-success); }
+
+        /* MODAL */
+        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .modal-backdrop { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 23, 19, 0.5); }
+        .modal-content { position: relative; z-index: 1001; background: var(--color-surface); padding: var(--space-6); border-radius: var(--radius-lg); max-width: 480px; width: 90%; }
+        .modal-actions { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-5); }
+        .modal-close { margin-top: var(--space-4); background: transparent; color: var(--color-text-muted); width: 100%; }
+    </style>
+</head>
+
+<body>
+
+    <!-- GLOBAL HEADER -->
+    <header id="site-header">
+        <div class="brand">
+            <a href="#beranda" class="nav-link" data-target="beranda">
+                <span class="logo-placeholder" aria-label="Logo LAPORKITA">LK</span>
+                <span>LAPORKITA</span>
+            </a>
+        </div>
+
+        <!-- NAVIGASI UTAMA (TAMBAHAN NAVIGASI BUAT LAPORAN HASIL PENYATUAN) -->
+        <nav aria-label="Navigasi utama">
+            <ul>
+                <li><a href="#beranda" class="nav-link" data-target="beranda">Beranda</a></li>
+                <li><a href="#peta-laporan" class="nav-link" data-target="peta-laporan">Peta</a></li>
+                <li><a href="#laporan-terbaru" class="nav-link" data-target="laporan-terbaru">Laporan Terbaru</a></li>
+                <li><a href="#formulir-laporan" class="nav-link" data-target="formulir-laporan">Buat Laporan</a></li>
+                <li><a href="#akun-masyarakat" class="nav-link" data-target="akun-masyarakat">Akun</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-account">
+            <button type="button" id="btn-login-modal" class="btn-auth-trigger">Masuk / Akun</button>
+        </div>
+    </header>
+
+    <!-- MAIN APPLICATION (SPA ROUTING) -->
+    <main id="main-content">
+
+        <!-- 01. BERANDA -->
+        <section id="beranda" class="page page-public">
+            <header class="page-header">
+                <p class="platform-label">Platform Civic-Tech</p>
+                <h1>Laporkan Masalah di Sekitarmu</h1>
+                <p>
+                    LAPORKITA membantu masyarakat melaporkan masalah
+                    fasilitas, sosial, lingkungan, dan dugaan pungutan
+                    yang perlu mendapatkan perhatian.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#formulir-laporan" class="nav-link" data-target="formulir-laporan">Buat Laporan</a>
+                    <a href="#peta-laporan" class="nav-link" data-target="peta-laporan">Lihat Peta</a>
+                </div>
+            </header>
+
+            <!-- KATEGORI LAPORAN -->
+            <section id="kategori-laporan">
+                <header>
+                    <h2>Laporkan Masalah</h2>
+                    <p>Pilih kategori masalah yang ingin Anda laporkan.</p>
+                </header>
+
+                <div class="report-category-list">
+                    <article class="report-category">
+                        <h3>Lapor Fasilitas</h3>
+                        <ul>
+                            <li>Jalan rusak</li>
+                            <li>Lampu jalan</li>
+                            <li>Drainase</li>
+                        </ul>
+                        <footer>
+                            <a href="#formulir-laporan" class="nav-link btn-category-select" data-category="fasilitas" data-target="formulir-laporan">Buat Laporan Fasilitas</a>
+                        </footer>
+                    </article>
+
+                    <article class="report-category">
+                        <h3>Lapor Dugaan Pungli</h3>
+                        <ul>
+                            <li>Pungutan tidak jelas</li>
+                            <li>Biaya di luar ketentuan</li>
+                        </ul>
+                        <footer>
+                            <a href="#formulir-laporan" class="nav-link btn-category-select" data-category="pungli" data-target="formulir-laporan">Buat Laporan Pungli</a>
+                        </footer>
+                    </article>
+
+                    <article class="report-category">
+                        <h3>Lapor Masalah Sosial</h3>
+                        <ul>
+                            <li>Gangguan ketertiban</li>
+                            <li>Konflik lingkungan</li>
+                        </ul>
+                        <footer>
+                            <a href="#formulir-laporan" class="nav-link btn-category-select" data-category="sosial" data-target="formulir-laporan">Buat Laporan Sosial</a>
+                        </footer>
+                    </article>
+
+                    <article class="report-category">
+                        <h3>Lapor Lingkungan</h3>
+                        <ul>
+                            <li>Sampah & Limbah</li>
+                            <li>Banjir & Polusi</li>
+                        </ul>
+                        <footer>
+                            <a href="#formulir-laporan" class="nav-link btn-category-select" data-category="lingkungan" data-target="formulir-laporan">Buat Laporan Lingkungan</a>
+                        </footer>
+                    </article>
+                </div>
+            </section>
+
+            <!-- KONDISI WILAYAH -->
+            <section id="kondisi-wilayah" style="margin-top: 3rem;">
+                <header><h2>Kondisi Wilayah</h2></header>
+                <div class="statistics-summary">
+                    <article><h3>Total laporan</h3><data id="stat-total" value="0">0</data></article>
+                    <article><h3>Laporan selesai</h3><data id="stat-completed" value="0">0</data></article>
+                    <article><h3>Laporan dalam proses</h3><data id="stat-processing" value="0">0</data></article>
+                    <article><h3>Menunggu verifikasi</h3><data id="stat-reported" value="0">0</data></article>
+                </div>
+            </section>
+
+            <section style="margin-top: 3rem;">
+                <header><h2>Laporan Terbaru</h2></header>
+                <div class="latest-report-list"></div>
+            </section>
+        </section>
+
+        <!-- 02. PETA LAPORAN -->
+        <section id="peta-laporan" class="page" style="display: none;">
+            <header class="page-header">
+                <h1>Peta Wilayah Laporan</h1>
+                <p>Visualisasi lokasi persebaran laporan warga secara spasial.</p>
+            </header>
+            <div style="min-height: 250px; border: 2px dashed var(--color-border); display: grid; place-items: center;">
+                [ MAP CONTAINER / READY FOR LEAFLET.JS ]
+            </div>
+        </section>
+
+        <!-- 03. LAPORAN TERBARU -->
+        <section id="laporan-terbaru" class="page" style="display: none;">
+            <header class="page-header">
+                <h1>Semua Laporan Warga</h1>
+                <p>Daftar seluruh laporan yang masuk ke dalam platform LAPORKITA.</p>
+            </header>
+            <div class="latest-report-list"></div>
+        </section>
+
+        <!-- 04. FORMULIR LAPORAN (SUDAH DIINTEGRASIKAN DENGAN FITUR UPLOAD FOTO) -->
+        <section id="formulir-laporan" class="page page-report-form" style="display: none;">
+            <header>
+                <h1>Buat Laporan</h1>
+                <p>Sampaikan masalah yang Anda temukan secara jelas dan relevan.</p>
+            </header>
+
+            <form id="main-report-form">
+                <fieldset>
+                    <legend>Informasi Laporan</legend>
+
+                    <div class="form-field">
+                        <label for="report-category">Kategori *</label>
+                        <select id="report-category" name="category" required>
+                            <option value="">Pilih kategori</option>
+                            <option value="fasilitas">Fasilitas</option>
+                            <option value="pungli">Dugaan Pungli</option>
+                            <option value="sosial">Masalah Sosial</option>
+                            <option value="lingkungan">Lingkungan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="report-subcategory">Subkategori *</label>
+                        <select id="report-subcategory" name="subcategory" required>
+                            <option value="">Pilih kategori terlebih dahulu</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="report-title">Judul laporan *</label>
+                        <input type="text" id="report-title" name="title" required placeholder="Tuliskan judul singkat masalah">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="report-description">Deskripsi masalah *</label>
+                        <textarea id="report-description" name="description" rows="5" required placeholder="Jelaskan detail permasalahan..."></textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Lokasi & Waktu</legend>
+                    <div class="form-field">
+                        <label for="location-name">Nama lokasi *</label>
+                        <input type="text" id="location-name" name="location_name" required placeholder="Contoh: Jl. Dago No. 12">
+                    </div>
+                    <div class="form-field">
+                        <label for="incident-date">Tanggal Kejadian *</label>
+                        <input type="date" id="incident-date" name="incident_date" required>
+                    </div>
+                </fieldset>
+
+                <!-- FIELDSET LAMPIRAN FOTO BUKTI -->
+                <fieldset>
+                    <legend>Lampiran & Privasi</legend>
+                    <div class="form-field">
+                        <label for="report-photo">Unggah Foto Bukti Kejadian</label>
+                        <input type="file" id="report-photo" name="photo" accept="image/*">
+                        <small style="color: var(--color-text-muted);">Format pendukung: JPG, PNG, WEBP.</small>
+                        <img id="photo-preview" class="report-img" style="display: none;" alt="Pratinjau foto bukti">
+                    </div>
+
+                    <div class="form-field" style="display: flex; gap: 10px; align-items: center; margin-top: 1rem;">
+                        <input type="radio" id="identity-visible" name="identity_visibility" value="visible" checked>
+                        <label for="identity-visible">Tampilkan Nama</label>
+                        <input type="radio" id="identity-hidden" name="identity_visibility" value="hidden">
+                        <label for="identity-hidden">Sembunyikan Identitas (Anonim)</label>
+                    </div>
+                </fieldset>
+
+                <div class="form-actions" style="display: flex; gap: 10px;">
+                    <button type="submit">Kirim Laporan</button>
+                    <button type="reset" id="btn-reset-form">Reset Form</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 05. AKUN MASYARAKAT / DASHBOARD -->
+        <section id="akun-masyarakat" class="page" style="display: none;">
+            <header class="page-header">
+                <h1>Dashboard Akun</h1>
+                <p id="user-welcome-text">Silakan login untuk mengakses laporan pribadi Anda.</p>
+            </header>
+            <div id="user-dashboard-content">
+                <h2>Laporan Saya</h2>
+                <div class="my-report-list" style="margin-top: 1rem;"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL AUTHENTICATION SIMULATION -->
+    <div id="auth-modal" class="modal" style="display: none;">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <h2>Simulasi Login System</h2>
+            <p>Pilih akun pengujian untuk menggunakan fitur platform:</p>
+            <div class="modal-actions">
+                <button type="button" id="login-as-citizen">Login Warga (Mohammad Arga)</button>
+                <button type="button" id="login-as-officer" style="background: var(--color-surface); color: var(--color-primary-dark); border-color: var(--color-border-strong);">Login Petugas Wilayah</button>
+            </div>
+            <button type="button" class="modal-close">Batal</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT APPLICATION -->
+    <script>
+        (() => {
+            'use strict';
+
+            const STORAGE_KEYS = { REPORTS: 'laporkita_reports', SESSION: 'laporkita_session' };
+
+            const MOCK_USERS = {
+                CITIZEN: { id: 'USR-CITIZEN-001', name: 'Mohammad Arga', role: 'citizen' },
+                OFFICER: { id: 'USR-OFFICER-001', name: 'Petugas Wilayah', role: 'officer' }
+            };
+
+            const REPORT_CATEGORIES = {
+                fasilitas: ['Jalan rusak', 'Lampu jalan', 'Drainase', 'Trotoar'],
+                pungli: ['Pungutan tidak jelas', 'Biaya di luar ketentuan', 'Dugaan pungutan liar'],
+                sosial: ['Gangguan ketertiban', 'Konflik lingkungan'],
+                lingkungan: ['Sampah', 'Pencemaran', 'Limbah', 'Banjir']
+            };
+
+            let currentPhotoBase64 = '';
+
+            function getStorage(key, fallback = null) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : fallback;
+                } catch (e) { return fallback; }
+            }
+
+            function setStorage(key, value) {
+                try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+            }
+
+            function navigateTo(targetId) {
+                const pages = document.querySelectorAll('.page');
+                let targetPage = document.getElementById(targetId) || document.getElementById('beranda');
+
+                pages.forEach(p => p.style.display = 'none');
+                targetPage.style.display = 'block';
+
+                document.querySelectorAll('#site-header nav a').forEach(a => {
+                    if (a.getAttribute('data-target') === targetId) a.setAttribute('aria-current', 'page');
+                    else a.removeAttribute('aria-current');
+                });
+
+                window.scrollTo(0, 0);
+                renderPageData(targetId);
+            }
+
+            function initRouter() {
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('.nav-link');
+                    if (link) {
+                        e.preventDefault();
+                        const target = link.getAttribute('data-target') || link.getAttribute('href').replace('#', '');
+                        if (link.classList.contains('btn-category-select')) {
+                            const cat = link.getAttribute('data-category');
+                            const catSelect = document.getElementById('report-category');
+                            if (catSelect && cat) {
+                                catSelect.value = cat;
+                                populateSubcategories(cat);
+                            }
+                        }
+                        window.location.hash = target;
+                        navigateTo(target);
+                    }
+                });
+
+                window.addEventListener('hashchange', () => {
+                    navigateTo(window.location.hash.replace('#', '') || 'beranda');
+                });
+                navigateTo(window.location.hash.replace('#', '') || 'beranda');
+            }
+
+            function populateSubcategories(catKey) {
+                const subSelect = document.getElementById('report-subcategory');
+                if (!subSelect) return;
+                subSelect.innerHTML = '';
+                const list = REPORT_CATEGORIES[catKey] || [];
+                if (list.length) {
+                    subSelect.innerHTML = '<option value="">Pilih subkategori</option>' + 
+                        list.map(s => `<option value="${s}">${s}</option>`).join('');
+                } else {
+                    subSelect.innerHTML = '<option value="">Pilih kategori terlebih dahulu</option>';
+                }
+            }
+
+            function updateAuthUI() {
+                const user = getStorage(STORAGE_KEYS.SESSION);
+                const btnAuth = document.getElementById('btn-login-modal');
+                const welcomeText = document.getElementById('user-welcome-text');
+
+                if (user) {
+                    if (btnAuth) btnAuth.textContent = `Keluar (${user.name})`;
+                    if (welcomeText) welcomeText.textContent = `Selamat datang kembali, ${user.name} [Role: ${user.role.toUpperCase()}]`;
+                } else {
+                    if (btnAuth) btnAuth.textContent = 'Masuk / Akun';
+                    if (welcomeText) welcomeText.textContent = 'Silakan login untuk mengakses laporan pribadi Anda.';
+                }
+            }
+
+            function initAuthModal() {
+                const modal = document.getElementById('auth-modal');
+                const btnTrigger = document.getElementById('btn-login-modal');
+                
+                if (btnTrigger) {
+                    btnTrigger.addEventListener('click', () => {
+                        if (getStorage(STORAGE_KEYS.SESSION)) {
+                            localStorage.removeItem(STORAGE_KEYS.SESSION);
+                            updateAuthUI();
+                            alert('Anda telah keluar.');
+                            navigateTo('beranda');
+                        } else {
+                            if (modal) modal.style.display = 'flex';
+                        }
+                    });
+                }
+
+                const closeModal = () => { if (modal) modal.style.display = 'none'; };
+                modal.querySelector('.modal-close').addEventListener('click', closeModal);
+                modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+
+                document.getElementById('login-as-citizen').addEventListener('click', () => {
+                    setStorage(STORAGE_KEYS.SESSION, MOCK_USERS.CITIZEN);
+                    updateAuthUI();
+                    closeModal();
+                    navigateTo('akun-masyarakat');
+                });
+
+                document.getElementById('login-as-officer').addEventListener('click', () => {
+                    setStorage(STORAGE_KEYS.SESSION, MOCK_USERS.OFFICER);
+                    updateAuthUI();
+                    closeModal();
+                    navigateTo('akun-masyarakat');
+                });
+            }
+
+            function initReportForm() {
+                const form = document.getElementById('main-report-form');
+                if (!form) return;
+
+                const photoInput = document.getElementById('report-photo');
+                const photoPreview = document.getElementById('photo-preview');
+
+                // Pemrosesan foto upload
+                if (photoInput) {
+                    photoInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (evt) => {
+                                currentPhotoBase64 = evt.target.result;
+                                photoPreview.src = currentPhotoBase64;
+                                photoPreview.style.display = 'block';
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            currentPhotoBase64 = '';
+                            photoPreview.style.display = 'none';
+                        }
+                    });
+                }
+
+                document.getElementById('btn-reset-form').addEventListener('click', () => {
+                    currentPhotoBase64 = '';
+                    if (photoPreview) photoPreview.style.display = 'none';
+                });
+
+                document.getElementById('report-category').addEventListener('change', (e) => populateSubcategories(e.target.value));
+
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const isAnon = document.getElementById('identity-hidden').checked;
+                    const sessionUser = getStorage(STORAGE_KEYS.SESSION) || MOCK_USERS.CITIZEN;
+
+                    const newReport = {
+                        id: `LK-2026-${String(getStorage(STORAGE_KEYS.REPORTS, []).length + 1).padStart(4, '0')}`,
+                        title: document.getElementById('report-title').value,
+                        category: document.getElementById('report-category').value,
+                        subcategory: document.getElementById('report-subcategory').value,
+                        description: document.getElementById('report-description').value,
+                        location: document.getElementById('location-name').value,
+                        date: document.getElementById('incident-date').value,
+                        photo: currentPhotoBase64,
+                        isAnonymous: isAnon,
+                        status: 'reported',
+                        reporter: isAnon ? 'Anonim' : sessionUser.name
+                    };
+
+                    const reports = getStorage(STORAGE_KEYS.REPORTS, []);
+                    reports.unshift(newReport);
+                    setStorage(STORAGE_KEYS.REPORTS, reports);
+
+                    form.reset();
+                    currentPhotoBase64 = '';
+                    if (photoPreview) photoPreview.style.display = 'none';
+
+                    alert(`Laporan terkirim! Kode ID: ${newReport.id}`);
+                    navigateTo('laporan-terbaru');
+                });
+            }
+
+            function renderPageData(pageId) {
+                const reports = getStorage(STORAGE_KEYS.REPORTS, []);
+                
+                if (document.getElementById('stat-total')) {
+                    document.getElementById('stat-total').textContent = reports.length;
+                    document.getElementById('stat-reported').textContent = reports.filter(r => r.status === 'reported').length;
+                    document.getElementById('stat-completed').textContent = reports.filter(r => r.status === 'completed').length;
+                }
+
+                if (pageId === 'beranda' || pageId === 'laporan-terbaru') {
+                    document.querySelectorAll('.latest-report-list').forEach(container => {
+                        container.innerHTML = reports.length ? reports.map(r => `
+                            <article class="report-card">
+                                <header>
+                                    <p>ID: <strong>${r.id}</strong> | Pelapor: <strong>${r.reporter}</strong></p>
+                                    <h3>${r.title}</h3>
+                                </header>
+                                <p><strong>Kategori:</strong> ${r.category.toUpperCase()} (${r.subcategory})</p>
+                                <p><strong>Lokasi:</strong> ${r.location}</p>
+                                <p><strong>Deskripsi:</strong> ${r.description}</p>
+                                ${r.photo ? `<img src="${r.photo}" class="report-img" alt="Foto Laporan">` : ''}
+                                <p style="margin-top: 0.5rem;"><span class="status status-${r.status}">${r.status.toUpperCase()}</span></p>
+                            </article>
+                        `).join('') : '<p>Belum ada laporan.</p>';
+                    });
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initRouter();
+                initAuthModal();
+                initReportForm();
+                updateAuthUI();
+            });
+        })();
+    </script>
+</body>
+</html>
